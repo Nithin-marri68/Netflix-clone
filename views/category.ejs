@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+
+<h2><%= category %> Movies</h2>
+
+<div class="movie-grid">
+  <% movies.forEach(movie => { %>
+    <div class="movie-card">
+      <img src="<%= movie.cover %>" alt="<%= movie.title %>">
+      <p><%= movie.title %></p>
+      <a href="/movie/<%= movie.id %>" class="btn">Watch</a>
+    </div>
+  <% }) %>
+</div>
+
+<div class="back-link">
+  <a href="/browse" class="btn">← Back to Browse</a>
+</div>
+
+<%- include('partials/footer') %>

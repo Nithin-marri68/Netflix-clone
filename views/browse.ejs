@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+
+<h2>Browse Movies</h2>
+
+<!-- ✅ Category Navigation -->
+<div class="category-bar">
+  <a href="/browse/telugu" class="category-btn <%= activeCategory === 'telugu' ? 'active' : '' %>">Telugu</a>
+  <a href="/browse/hindi" class="category-btn <%= activeCategory === 'hindi' ? 'active' : '' %>">Hindi</a>
+  <a href="/browse/english" class="category-btn <%= activeCategory === 'english' ? 'active' : '' %>">English</a>
+</div>
+
+<!-- ✅ Movies Display -->
+<div class="movie-grid">
+  <% if (movies && movies.length > 0) { %>
+    <% movies.forEach(movie => { %>
+      <div class="movie-card">
+        <img src="<%= movie.cover %>" alt="<%= movie.title %>">
+        <p><%= movie.title %></p>
+        <a href="<%= movie.trailer %>" target="_blank" class="btn">Watch</a>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No movies available in this category.</p>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
