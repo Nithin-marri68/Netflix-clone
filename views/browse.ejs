@@ -1,27 +1,273 @@
 <%- include('partials/header') %>
 
-<h2>Browse Movies</h2>
+<div class="browse-wrapper">
+  <div class="browse-header">
+    <h1 class="browse-title">Browse Movies</h1>
+    <p class="browse-subtitle">Discover your next favorite movie</p>
+  </div>
 
-<!-- ✅ Category Navigation -->
-<div class="category-bar">
-  <a href="/browse/telugu" class="category-btn <%= activeCategory === 'telugu' ? 'active' : '' %>">Telugu</a>
-  <a href="/browse/hindi" class="category-btn <%= activeCategory === 'hindi' ? 'active' : '' %>">Hindi</a>
-  <a href="/browse/english" class="category-btn <%= activeCategory === 'english' ? 'active' : '' %>">English</a>
-</div>
+  <!-- Search and Filter Bar -->
+  <div class="browse-controls">
+    <div class="search-container">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="search-input" 
+        placeholder="Search movies by title..."
+        autocomplete="off"
+      >
+      <button id="clearSearch" class="clear-search-btn" style="display: none;">×</button>
+    </div>
 
-<!-- ✅ Movies Display -->
-<div class="movie-grid">
-  <% if (movies && movies.length > 0) { %>
-    <% movies.forEach(movie => { %>
-      <div class="movie-card">
-        <img src="<%= movie.cover %>" alt="<%= movie.title %>">
-        <p><%= movie.title %></p>
-        <a href="<%= movie.trailer %>" target="_blank" class="btn">Watch</a>
+    <div class="filter-container">
+      <select id="categoryFilter" class="filter-select">
+        <option value="all">All Categories</option>
+        <option value="telugu">Telugu</option>
+        <option value="hindi">Hindi</option>
+        <option value="english">English</option>
+      </select>
+
+      <select id="sortFilter" class="filter-select">
+        <option value="default">Default</option>
+        <option value="title-asc">Title (A-Z)</option>
+        <option value="title-desc">Title (Z-A)</option>
+        <option value="category">Category</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Category Navigation -->
+  <div class="category-bar">
+    <button class="category-btn active" data-category="all">All</button>
+    <button class="category-btn" data-category="telugu">Telugu</button>
+    <button class="category-btn" data-category="hindi">Hindi</button>
+    <button class="category-btn" data-category="english">English</button>
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-info">
+    <span id="resultsCount"><%= movies.length %> movies found</span>
+  </div>
+
+  <!-- Movies Display -->
+  <div class="movie-grid" id="movieGrid">
+    <% if (movies && movies.length > 0) { %>
+      <% movies.forEach(movie => { %>
+        <div class="movie-card" 
+             data-title="<%= movie.title.toLowerCase() %>" 
+             data-category="<%= movie.category %>"
+             data-id="<%= movie.id %>">
+          <div class="movie-image-wrapper">
+            <img src="<%= movie.cover %>" alt="<%= movie.title %>" class="movie-image" loading="lazy">
+            <div class="movie-overlay">
+              <a href="<%= movie.trailer %>" target="_blank" class="movie-play-btn" title="Watch Trailer">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </a>
+              <div class="movie-info-hover">
+                <span class="movie-category-badge"><%= movie.category.charAt(0).toUpperCase() + movie.category.slice(1) %></span>
+              </div>
+            </div>
+          </div>
+          <div class="movie-details">
+            <h3 class="movie-title"><%= movie.title %></h3>
+            <p class="movie-category"><%= movie.category.charAt(0).toUpperCase() + movie.category.slice(1) %></p>
+            <div class="movie-actions">
+              <a href="<%= movie.trailer %>" target="_blank" class="movie-action-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Watch
+              </a>
+              <button class="movie-action-btn add-to-watchlist" data-movie="<%= movie.title %>" title="Add to Watchlist">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="no-results">
+        <div class="no-results-icon">🎬</div>
+        <h3>No movies found</h3>
+        <p>Try adjusting your search or filter criteria</p>
       </div>
-    <% }) %>
-  <% } else { %>
-    <p>No movies available in this category.</p>
-  <% } %>
+    <% } %>
+  </div>
 </div>
+
+<script>
+  // Movie data from server
+  const allMovies = [
+    <% movies.forEach((movie, index) => { %>
+      {
+        id: <%= movie.id %>,
+        title: "<%= movie.title %>",
+        cover: "<%= movie.cover %>",
+        trailer: "<%= movie.trailer %>",
+        category: "<%= movie.category %>"
+      }<%= index < movies.length - 1 ? ',' : '' %>
+    <% }) %>
+  ];
+
+  // DOM Elements
+  const searchInput = document.getElementById('searchInput');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const sortFilter = document.getElementById('sortFilter');
+  const categoryButtons = document.querySelectorAll('.category-btn');
+  const movieGrid = document.getElementById('movieGrid');
+  const resultsCount = document.getElementById('resultsCount');
+  const clearSearchBtn = document.getElementById('clearSearch');
+
+  // Set initial category filter based on URL
+  const urlPath = window.location.pathname;
+  if (urlPath.includes('/telugu')) {
+    categoryFilter.value = 'telugu';
+    updateActiveCategory('telugu');
+  } else if (urlPath.includes('/hindi')) {
+    categoryFilter.value = 'hindi';
+    updateActiveCategory('hindi');
+  } else if (urlPath.includes('/english')) {
+    categoryFilter.value = 'english';
+    updateActiveCategory('english');
+  } else {
+    updateActiveCategory('all');
+  }
+
+  // Update active category button
+  function updateActiveCategory(category) {
+    categoryButtons.forEach(btn => {
+      if (btn.dataset.category === category) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // Filter and display movies
+  function filterMovies() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const selectedCategory = categoryFilter.value;
+    const sortOption = sortFilter.value;
+
+    // Show/hide clear search button
+    clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+
+    // Filter movies
+    let filtered = allMovies.filter(movie => {
+      const matchesSearch = movie.title.toLowerCase().includes(searchTerm);
+      const matchesCategory = selectedCategory === 'all' || movie.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+
+    // Sort movies
+    if (sortOption === 'title-asc') {
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOption === 'title-desc') {
+      filtered.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (sortOption === 'category') {
+      filtered.sort((a, b) => a.category.localeCompare(b.category));
+    }
+
+    // Update results count
+    resultsCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'movie' : 'movies'} found`;
+
+    // Display filtered movies
+    displayMovies(filtered);
+  }
+
+  // Display movies in grid
+  function displayMovies(movies) {
+    if (movies.length === 0) {
+      movieGrid.innerHTML = `
+        <div class="no-results">
+          <div class="no-results-icon">🎬</div>
+          <h3>No movies found</h3>
+          <p>Try adjusting your search or filter criteria</p>
+        </div>
+      `;
+      return;
+    }
+
+    movieGrid.innerHTML = movies.map(movie => `
+      <div class="movie-card" 
+           data-title="${movie.title.toLowerCase()}" 
+           data-category="${movie.category}"
+           data-id="${movie.id}">
+        <div class="movie-image-wrapper">
+          <img src="${movie.cover}" alt="${movie.title}" class="movie-image" loading="lazy">
+          <div class="movie-overlay">
+            <a href="${movie.trailer}" target="_blank" class="movie-play-btn" title="Watch Trailer">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </a>
+            <div class="movie-info-hover">
+              <span class="movie-category-badge">${movie.category.charAt(0).toUpperCase() + movie.category.slice(1)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="movie-details">
+          <h3 class="movie-title">${movie.title}</h3>
+          <p class="movie-category">${movie.category.charAt(0).toUpperCase() + movie.category.slice(1)}</p>
+          <div class="movie-actions">
+            <a href="${movie.trailer}" target="_blank" class="movie-action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Watch
+            </a>
+            <button class="movie-action-btn add-to-watchlist" data-movie="${movie.title}" title="Add to Watchlist">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Event Listeners
+  searchInput.addEventListener('input', filterMovies);
+  categoryFilter.addEventListener('change', filterMovies);
+  sortFilter.addEventListener('change', filterMovies);
+
+  // Category button clicks
+  categoryButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.dataset.category;
+      categoryFilter.value = category;
+      updateActiveCategory(category);
+      filterMovies();
+    });
+  });
+
+  // Clear search
+  clearSearchBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    clearSearchBtn.style.display = 'none';
+    filterMovies();
+    searchInput.focus();
+  });
+
+  // Add to watchlist (placeholder - you can implement this later)
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.add-to-watchlist')) {
+      const movieTitle = e.target.closest('.add-to-watchlist').dataset.movie;
+      alert(`"${movieTitle}" added to watchlist! (Feature coming soon)`);
+    }
+  });
+</script>
 
 <%- include('partials/footer') %>

@@ -1,12 +1,17 @@
 // controllers/pagesController.js
 
 exports.home = (req, res) => {
-  res.render("home");
+  res.render("home", { 
+    userId: req.session?.userId,
+    userName: req.session?.userName 
+  });
 };
 
 exports.sign = (req, res) => {
-  res.render("sign");
+  res.redirect('/auth/login'); // Redirect to new auth route
 };
+
+// ... rest of your existing code ...
 
 const allMovies = [
   // ---------- TELUGU ----------

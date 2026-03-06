@@ -11,9 +11,17 @@
     <div class="logo">🍿 Netflix Clone</div>
     <div>
       <a href="/">Home</a>
-      <a href="/browse">Browse</a>
-      <a href="/user/profile">Profile</a>
-      <a href="/sign">Sign In</a>
+      <% if (typeof userId !== 'undefined' && userId) { %>
+        <a href="/browse">Browse</a>
+        <a href="/user/profile">Profile</a>
+        <form method="POST" action="/auth/logout" style="display: inline;">
+          <button type="submit" style="background: none; border: none; color: inherit; cursor: pointer; text-decoration: underline;">
+            Logout
+          </button>
+        </form>
+      <% } else { %>
+        <a href="/auth/login">Sign In</a>
+      <% } %>
     </div>
   </nav>
   <main class="container">

@@ -1,7 +1,124 @@
 <%- include('partials/header') %>
-<h1>Welcome to Netflix Clone</h1>
-<p>Watch your favorite shows instantly.</p>
-<a class="btn" href="/browse">Start Watching</a>
+
+<div class="home-wrapper">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Unlimited movies, TV shows, and more
+      </h1>
+      <p class="hero-subtitle">
+        Watch anywhere. Cancel anytime.
+      </p>
+      <div class="hero-buttons">
+        <% if (userId) { %>
+          <a href="/browse" class="hero-btn primary">
+            <span>Start Watching</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </a>
+          <a href="/user/profile" class="hero-btn secondary">
+            My Profile
+          </a>
+        <% } else { %>
+          <a href="/auth/register" class="hero-btn primary">
+            <span>Get Started</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="/auth/login" class="hero-btn secondary">
+            Sign In
+          </a>
+        <% } %>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="feature-item">
+      <div class="feature-icon">📺</div>
+      <h3 class="feature-title">Watch Anywhere</h3>
+      <p class="feature-description">Stream on your phone, tablet, laptop, and TV.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">📱</div>
+      <h3 class="feature-title">Download & Go</h3>
+      <p class="feature-description">Save your data. Watch offline on a plane, train, or submarine.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">👥</div>
+      <h3 class="feature-title">Create Profiles</h3>
+      <p class="feature-description">Separate profiles for different family members.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🔒</div>
+      <h3 class="feature-title">Secure & Private</h3>
+      <p class="feature-description">Your data is safe with us. We respect your privacy.</p>
+    </div>
+  </section>
+
+  <!-- Popular Movies Preview -->
+  <section class="popular-section">
+    <div class="section-header-home">
+      <h2 class="section-title-home">Popular Now</h2>
+      <% if (userId) { %>
+        <a href="/browse" class="view-all-link">View All →</a>
+      <% } %>
+    </div>
+    <div class="popular-grid">
+      <div class="popular-card">
+        <div class="popular-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <span class="popular-number">1</span>
+        </div>
+        <h4 class="popular-title">RRR</h4>
+        <p class="popular-category">Telugu</p>
+      </div>
+      <div class="popular-card">
+        <div class="popular-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          <span class="popular-number">2</span>
+        </div>
+        <h4 class="popular-title">Inception</h4>
+        <p class="popular-category">English</p>
+      </div>
+      <div class="popular-card">
+        <div class="popular-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+          <span class="popular-number">3</span>
+        </div>
+        <h4 class="popular-title">Dangal</h4>
+        <p class="popular-category">Hindi</p>
+      </div>
+      <div class="popular-card">
+        <div class="popular-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+          <span class="popular-number">4</span>
+        </div>
+        <h4 class="popular-title">Interstellar</h4>
+        <p class="popular-category">English</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <% if (!userId) { %>
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to watch? Enter your email to create or restart your membership.</h2>
+        <div class="cta-form">
+          <input type="email" placeholder="Email address" class="cta-input">
+          <a href="/auth/register" class="cta-button">
+            Get Started
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  <% } %>
+</div>
+
 <%- include('partials/footer') %>
-
-

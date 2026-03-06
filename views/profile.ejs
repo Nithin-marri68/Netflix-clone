@@ -1,10 +1,86 @@
 <%- include('partials/header') %>
-<h2><%= user.name %></h2>
-<p><%= user.email %></p>
-<h3>Watchlist</h3>
-<ul>
-  <% user.watchlist.forEach(movie => { %>
-    <li><%= movie %></li>
-  <% }) %>
-</ul>
+
+<div class="profile-wrapper">
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-circle">
+          <span class="avatar-initial"><%= user.name.charAt(0).toUpperCase() %></span>
+        </div>
+      </div>
+      <div class="profile-info">
+        <h1 class="profile-name"><%= user.name %></h1>
+        <p class="profile-email"><%= user.email %></p>
+      </div>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-icon">📺</span>
+            My Watchlist
+          </h2>
+          <span class="watchlist-count"><%= user.watchlist.length %> <%= user.watchlist.length === 1 ? 'item' : 'items' %></span>
+        </div>
+        
+        <% if (user.watchlist && user.watchlist.length > 0) { %>
+          <div class="watchlist-grid">
+            <% user.watchlist.forEach((movie, index) => { %>
+              <div class="watchlist-item">
+                <div class="watchlist-number"><%= index + 1 %></div>
+                <div class="watchlist-content">
+                  <h3 class="watchlist-title"><%= movie %></h3>
+                  <button class="watchlist-remove-btn" data-movie="<%= movie %>">Remove</button>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="empty-watchlist">
+            <div class="empty-icon">📭</div>
+            <p class="empty-text">Your watchlist is empty</p>
+            <a href="/browse" class="browse-link">Browse Movies</a>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="profile-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-icon">⚙️</span>
+            Account Settings
+          </h2>
+        </div>
+        <div class="settings-grid">
+          <div class="setting-item">
+            <div class="setting-icon">👤</div>
+            <div class="setting-info">
+              <h3>Profile Information</h3>
+              <p>Manage your personal information</p>
+            </div>
+            <button class="setting-btn">Edit</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-icon">🔒</div>
+            <div class="setting-info">
+              <h3>Password & Security</h3>
+              <p>Change your password</p>
+            </div>
+            <button class="setting-btn">Change</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-icon">🔔</div>
+            <div class="setting-info">
+              <h3>Notifications</h3>
+              <p>Manage notification preferences</p>
+            </div>
+            <button class="setting-btn">Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%- include('partials/footer') %>
